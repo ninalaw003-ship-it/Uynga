@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moving Photo Frame ❤️</title>
+
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+  font-family: Arial, sans-serif;
+}
+
+#start {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 16px 30px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 30px;
+  font-size: 18px;
+  z-index: 10;
+}
+</style>
+</head>
+
+<body>
+
+<button id="start">Open Your Memory ❤️</button>
+
+<a-scene
+  mindar-image="imageTargetSrc: ./targets%20(1).mind;"
+  embedded
+  color-space="sRGB"
+  renderer="colorManagement: true">
+
+  <a-assets>
+    <video
+      id="memory"
+      src="./Video.mp4"
+      loop
+      playsinline
+      crossorigin="anonymous">
+    </video>
+  </a-assets>
+
+  <a-camera
+    position="0 0 0"
+    look-controls="enabled: false">
+  </a-camera>
+
+  <a-entity mindar-image-target="targetIndex: 0">
+
+    <a-video
+      src="#memory"
+      width="0.75"
+      height="1"
+      position="0 0 0">
+    </a-video>
+
+  </a-entity>
+
+</a-scene>
+
+<script>
+const button = document.getElementById("start");
+const video = document.getElementById("memory");
+
+button.addEventListener("click", async () => {
+  button.style.display = "none";
+
+  try {
+    await video.play();
+  } catch (error) {
+    console.log(error);
+  }
+});
+</script>
+
+</body>
+</htm

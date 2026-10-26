@@ -1,89 +1,254 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="mn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moving Photo Frame ❤️</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <title>Our Special Day ❤️</title>
 
-<style>
-body {
-  margin: 0;
-  overflow: hidden;
-  background: #000;
-  font-family: Arial, sans-serif;
-}
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-#start {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 16px 30px;
-  background: white;
-  color: black;
-  border: none;
-  border-radius: 30px;
-  font-size: 18px;
-  z-index: 10;
-}
-</style>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: Georgia, serif;
+    }
+
+    #welcome {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 25px;
+      text-align: center;
+      background: #fffaf7;
+      color: #473b38;
+    }
+
+    #welcome h1 {
+      font-size: 30px;
+    }
+
+    #welcome p {
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    #start {
+      margin-top: 20px;
+      padding: 16px 30px;
+      border: none;
+      border-radius: 30px;
+      background: #8e5c57;
+      color: white;
+      font-size: 18px;
+    }
+
+    #hint {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    a-scene {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 
 <body>
 
-<button id="start">Open Your Memory ❤️</button>
+  <div id="welcome">
 
-<a-scene
-  mindar-image="imageTargetSrc: ./targets%20(1).mind;"
-  embedded
-  color-space="sRGB"
-  renderer="colorManagement: true">
+    <h1>For My Love ❤️</h1>
 
-  <a-assets>
-    <video
-      id="memory"
-      src="./Video.mp4"
-      loop
-      playsinline
-      crossorigin="anonymous">
-    </video>
-  </a-assets>
+    <p>
+      Our little story is waiting for you.
+    </p>
 
-  <a-camera
-    position="0 0 0"
-    look-controls="enabled: false">
-  </a-camera>
+    <button id="start">
+      Open Our Story ❤️
+    </button>
 
-  <a-entity mindar-image-target="targetIndex: 0">
+    <p id="hint">
+      Tap to start, then point your camera at the birthday picture.
+    </p>
 
-    <a-video
-      src="#memory"
-      width="0.75"
-      height="1"
-      position="0 0 0">
-    </a-video>
+  </div>
 
-  </a-entity>
 
-</a-scene>
+  <a-scene
+    mindar-image="imageTargetSrc: ./targets%20(1).mind; autoStart: false; filterMinCF: 0.0001; filterBeta: 0.001;"
+    color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    embedded>
 
-<script>
-const button = document.getElementById("start");
-const video = document.getElementById("memory");
+    <a-assets>
 
-button.addEventListener("click", async () => {
-  button.style.display = "none";
+      <video
+        id="loveVideo"
+        src="./Video.mp4"
+        preload="auto"
+        playsinline
+        webkit-playsinline
+        muted
+        loop
+        crossorigin="anonymous">
+      </video>
 
-  try {
-    await video.play();
-  } catch (error) {
-    console.log(error);
-  }
-});
-</script>
+    </a-assets>
+
+
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false">
+    </a-camera>
+
+
+    <a-entity
+      id="target"
+      mindar-image-target="targetIndex: 0">
+
+      <a-video
+        id="arVideo"
+        src="#loveVideo"
+        width="0.75"
+        height="1"
+        position="0 0 0"
+        rotation="0 0 0">
+      </a-video>
+
+    </a-entity>
+
+  </a-scene>
+
+
+  <script>
+
+    const startButton = document.getElementById("start");
+
+    const welcome = document.getElementById("welcome");
+
+    const hint = document.getElementById("hint");
+
+    const scene = document.querySelector("a-scene");
+
+    const video = document.getElementById("loveVideo");
+
+
+    let arStarted = false;
+
+
+    // Start AR
+
+    startButton.addEventListener("click", async () => {
+
+      try {
+
+        hint.textContent = "Starting camera...";
+
+        video.muted = true;
+
+        await video.play();
+
+        video.pause();
+
+        await scene.systems["mindar-image-system"].start();
+
+        arStarted = true;
+
+        welcome.style.display = "none";
+
+      } catch (error) {
+
+        console.error("AR start error:", error);
+
+        welcome.style.display = "flex";
+
+        hint.textContent =
+          "Camera could not start. Please allow camera access and try again.";
+
+      }
+
+    });
+
+
+    // Image detected
+
+    scene.addEventListener("targetFound", async () => {
+
+      console.log("Image detected!");
+
+      try {
+
+        video.muted = false;
+
+        video.currentTime = 0;
+
+        await video.play();
+
+      } catch (error) {
+
+        console.error("Video playback error:", error);
+
+        hint.textContent =
+          "Video could not play. Please tap Open Our Story again.";
+
+        welcome.style.display = "flex";
+
+      }
+
+    });
+
+
+    // Image lost
+
+    scene.addEventListener("targetLost", () => {
+
+      console.log("Image lost!");
+
+      video.pause();
+
+    });
+
+
+    // Video error
+
+    video.addEventListener("error", () => {
+
+      console.error("Video file error:", video.error);
+
+      hint.textContent =
+        "Video file could not load. Please check Video.mp4.";
+
+    });
+
+
+    // Video loaded
+
+    video.addEventListener("loadeddata", () => {
+
+      console.log("Video loaded successfully!");
+
+    });
+
+
+  </script>
 
 </body>
-</htm
+</html>
